@@ -25,6 +25,14 @@ This is the top-level research directory for reproducible digital archaeology: e
 
 Claudeが現在のトークン資産残高・USD評価額・保有アドレス数、および管理権限や運営上の制約によって引き出せない資産の内訳を調査中です。**集計値は未検証で、まだ公表していません。** [調査の集計基準と提出要件](./cases/CLAUDE_ASSET_INVENTORY_BRIEF.md)
 
+## 毎回の発掘報告書 — Recovery Map
+
+すべての発掘案件について、**沈没船の所在・資産目録・正当な権利者・回収条件・証拠・未検証事項**を同じ書式で記録します。公開版には悪用可能な具体的手順や秘密情報を含めません。
+
+- [Recovery Map テンプレート](./methodology/RECOVERY_MAP_TEMPLATE.md)
+- [全案件への適用ルール](./methodology/RECOVERY_MAP_POLICY.md)
+- [論文集計用JSONひな形](./methodology/recovery-map.example.json)
+
 ## Directory map
 
 | Directory | Purpose |
