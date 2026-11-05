@@ -17,17 +17,25 @@ Munchables `LockManager` `0xEA091311Fc07139d753A6BBfcA27aB0224854Bae` on Blast (
 
 ## Publication-safety audit — can a third party steal these funds?
 
-Complete outflow-path audit of the contract (verified source + on-chain probes):
+**Scope statement (corrected per peer review):** the claim is scoped to what was actually verified — LockManager + MigrationManager + BLAST token (verified sources) and on-chain probes. We do not assert impossibility over code we have not audited; residual dependencies are listed explicitly at the end.
 
-- **Only ONE principal-out path exists:** `unlock()` — it debits `lockedTokens[msg.sender]` and pays `msg.sender` exclusively (the only `.call{value}`/`token.transfer` sites in the contract, lines 427/431).
-- `claimERC20Yield`: callable only by the configured `RewardsManager` contract and calls `IERC20Rebasing.claim()` — pays **yield only**, cannot touch principal (non-governor call reverts `0x1a48f084`, logged).
-- `lockOnBehalf`: restricted to `MigrationManager` (`onlyConfiguredContract`); it can only *add* locks, never withdraw — no griefing/theft surface.
-- `lock()`: self-directed only (`lockRecipient = msg.sender`); cannot touch other ledgers.
-- Governor (`0x4d0158d4…`) / configStorage functions: pricing/config only; no fund-moving path. `Paused` flag can temporarily halt unlock (liveness, not custody).
-- No `selfdestruct`, no `delegatecall`, non-proxy immutable bytecode.
-- Empirical exclusivity: three distinct non-claimant callers (`0x…dEaD`, a different real BLAST locker, an ETH-only locker) all revert `InsufficientLockAmountError` on this lock.
+### Principal-outflow paths — verified closed
+- **`unlock()`** — the ONLY principal-moving function in LockManager (only `.call{value}`/`token.transfer` sites, L427/L431); pays `msg.sender` exclusively from `lockedTokens[msg.sender]`. Three distinct non-claimant callers revert `InsufficientLockAmountError` at PIN (logged).
+- **`lockOnBehalf` lock-extension (griefing):** callable only BY `MigrationManager` (`onlyConfiguredContract`). Inside MigrationManager, `lockOnBehalf` is invoked solely from `_migrateNFTs` with quantity derived from **sealed** migration-snapshot data (`seal=true` — admin can no longer inject). Trigger requires `_userLockedAction[_user]==LOCKED_FULL_MIGRATION`, set only by the user themself funding `lockFundsForAllMigration()`. Our depositor has `getUserMigrateQuantityAll = (0,0)` → path cannot activate for them. **Closed by source + on-chain state.**
+- **`claimERC20Yield`:** callable only by configured `RewardsManager`; calls `IERC20Rebasing.claim()` (yield-only semantics). For BLAST specifically the token is a plain OZ ERC20Votes with **no `claim()`** — the call is dead code for BLAST and reverts. **Closed.**
+- **`MigrationManager.rescue`:** `onlyAdmin`, but moves only **its own balance** (`transferFrom(address(this),…)`) — cannot reach LockManager funds. **Closed.**
+- **BLAST token admin (`GovernanceToken`):** sole extra function is `mint()` `onlyOwner` (`MintManager` `0xCa2e5b98…`) — dilution, not balance seizure; no blacklist/clawback/freeze/transfer-gating. Standard OZ `transfer` returns bool → unchecked-return in `unlock` is harmless for this token (a non-compliant ERC20 could cause accounting loss, not theft).
+- **Governance/config:** USD-price/config functions move no funds; `Paused` is a liveness flag only.
+- No `selfdestruct`, `delegatecall`, or proxy — immutable runtime bytecode.
 
-**Conclusion:** third-party theft is cryptographically impossible — the only credential is the depositor EOA's signature. Publishing exposes nothing an attacker could use; all data was already public chain state. The only entity that can ever take these funds is the rightful owner — which is precisely the salvage this excavation verifies.
+### Residual dependencies (honestly NOT fully closed)
+- Depositor EOA `0x3a57e710…` private key — the sole credential that can ever claim the 100,000 BLAST.
+- `AccountManager.forceHarvest` inside `unlock` — liveness dependency: a bricked/upgraded AccountManager could revert `unlock` (freeze, not theft).
+- `configStorage` `Paused` flag — governor can temporarily halt `unlock` (freeze, not theft).
+- `MintManager` inflation — dilutes BLAST value; cannot move the locked principal.
+- Blast chain-level availability — systemic, out of scope.
+
+**Conclusion (narrowed):** within the audited surface — all of LockManager's own code, the MigrationManager contract that can reach it, and the BLAST token implementation — **no path exists by which any third party can move the locked principal**. Theft requires the depositor's own signature; that is the salvage this excavation verifies, not a vulnerability.
 
 ## Remaining candidate paths (untested, explicitly NOT_RUN)
 - 17 further BLAST lockers (~13,198 BLAST) + ETH/USDB dust — same `unlock` path presumed live.
