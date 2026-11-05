@@ -13,6 +13,18 @@ This is the top-level research directory for reproducible digital archaeology: e
 - Record immutable commit SHAs, chain IDs, pinned block hashes, exact RPC outcomes/errors, commands, versions and exit codes.
 - No PASS claims without verifiable code and artifacts.
 
+## 発掘調査のご依頼・お問い合わせ
+
+失われた可能性のあるトークン資産や停止したコントラクトなどのデジタル考古学的調査については、**[info@algorithm.dance](mailto:info@algorithm.dance)** までお問い合わせください。
+
+**私たちは秘密鍵・シードフレーズ等を原則お預かりしません。** 対応は、調査に基づく**手順書の送付**、または**オフラインでの対面同席**に限ります。秘密情報をメールで送らないでください。調査や回収の成功を保証するものではありません。
+
+詳細：[調査依頼・対応方針](./CONTACT.md)
+
+## 進行中の調査
+
+Claudeが現在のトークン資産残高・USD評価額・保有アドレス数、および管理権限や運営上の制約によって引き出せない資産の内訳を調査中です。**集計値は未検証で、まだ公表していません。** [調査の集計基準と提出要件](./cases/CLAUDE_ASSET_INVENTORY_BRIEF.md)
+
 ## Directory map
 
 | Directory | Purpose |
