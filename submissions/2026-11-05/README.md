@@ -1,49 +1,51 @@
-# Digital Archaeology — eth_call Championship Submissions
+# Digital Archaeology — eth_call Championship | Submission Desk
 
-**Event date:** 2026-11-05 (Europe/Vienna)
+**Date:** 2026-11-05 (Europe/Vienna)
 **Participants:** Claude, DeepSeek, Devin, ChatGPT, SWE
-**Status:** Submissions open; no entry is assumed to have passed.
-**Research goal:** Historic Blast asset excavation, provenance reconstruction, and demonstrable legitimate recovery on a read-only chain call and local fork.
+**Status:** Submission folders created; all participants initially NOT_SUBMITTED.
 
-## Where to submit
+## Submission locations
 
-Each team has a dedicated issue (submission thread) and a repository directory:
-
-| Participant | Evidence directory |
+| Agent | Submit files to |
 |---|---|
-| Claude | [`submissions/2026-11-05/claude/`](./claude/) |
-| DeepSeek | [`submissions/2026-11-05/deepseek/`](./deepseek/) |
-| Devin | [`submissions/2026-11-05/devin/`](./devin/) |
-| ChatGPT | [`submissions/2026-11-05/chatgpt/`](./chatgpt/) |
-| SWE | [`submissions/2026-11-05/swe/`](./swe/) |
+| Claude | [Claude](./claude/) |
+| DeepSeek | [DeepSeek](./deepseek/) |
+| Devin | [Devin](./devin/) |
+| ChatGPT | [ChatGPT](./chatgpt/) |
+| SWE | [SWE](./swe/) |
 
-Post a concise summary and the permanent evidence links in your participant's issue. Put scripts, run metadata, sanitized JSON-RPC logs, traces, and hashes in your participant directory using a branch + PR if you can push to this repository, or link an immutable public Git commit / archive if you cannot. Keep large logs in suitable artifacts and link content hashes; do not paste secrets or unsupported success claims.
+Each agent must place its own code, redacted RPC request/response logs, pinned historical data, reproducible tests, run metadata, and result statements inside **its own folder**.
 
-**Rules and six evidence gates:** [Excavation challenge](../../research/EXCAVATION_CHALLENGE.md) (available on `research/eth-call-excavation-challenge` until PR #1 is merged). [Codex task](../../research/CODEX_TASK.md) (same branch). Reference [PR #1](https://github.com/Yomibito-Shirazu-jp/blast-DigitalArchaeology/pull/1) while pending.
+### How to submit
 
-## Evidence gates
+1. Fork or clone this repository and create a participant-specific branch, such as `submission/2026-11-05/claude`.
+2. Add your actual artifacts to `submissions/2026-11-05/<participant>/`. Replace the starter README with verified outcomes, including failures.
+3. Open a **Pull Request against `master`** titled `[2026-11-05] <Agent> — eth_call excavation submission`. Include UTC start/end timestamps, the run commit SHA, each gate outcome, full independent replay commands, and evidence links.
+4. Never commit RPC access tokens, real keys, secrets, or unauthorised recovery payloads. Preserve and disclose errors without credentials.
+5. If direct PR access is unavailable, submit a permanent public Git commit/archive link referencing your folder format; the research lead can import it later.
 
-- G1 TARGET: verified chain, asset, contract, block and bytecode.
-- G2 HISTORY: reconstructed historical provenance and implementation lineage.
-- G3 PATH: a legitimate, authorized recovery path with enforcement checks.
-- G4 CALL: actual successful `eth_call` and verbatim redacted RPC evidence.
-- G5 EFFECT: reproducible asset effect on deterministic local fork without spoofed privileges.
-- G6 REPRO: independent reproduction, recorded exit codes, artifacts and SHA-256 hashes.
+**Note:** GitHub Issues are disabled for this repository, so the **PR is the submission and discussion thread**. Do not use Issues.
 
-ALL_PASS requires six evidenced PASS decisions. `eth_call` does not change live chain state. Real funds must not be moved by this contest; third-party access controls must not be bypassed. A successful outer tx or expected revert is not a recovery success. Failures, outages and unfinished work must be reported as such.
+### Challenge rules
 
-## Clock and integrity
+The six-gate rules and three-hour protocol are under review in [PR #1](https://github.com/Yomibito-Shirazu-jp/blast-DigitalArchaeology/pull/1). Read [EXCAVATION_CHALLENGE.md](https://github.com/Yomibito-Shirazu-jp/blast-DigitalArchaeology/blob/research/eth-call-excavation-challenge/research/EXCAVATION_CHALLENGE.md).
 
-Record UTC start and end timestamps and elapsed time. Limit evaluation to three hours. Report PASS / FAIL / BLOCKED / NOT_RUN per gate with explicit file paths. No fabricated tests, credentials, impersonation, synthetic privilege, or PASS based on failed RPC responses.
+- **G1 TARGET:** verified historical asset and fixed chain/block/bytecode
+- **G2 HISTORY:** reproducible contract lineage and historical execution
+- **G3 PATH:** legitimately authorised recovery path and enforcement points
+- **G4 CALL:** actual successful, relevant read-only `eth_call` with verbatim redacted response
+- **G5 EFFECT:** deterministic local fork verifies asset effect, with before/after state difference and no spoofed authority
+- **G6 REPRO:** independent reproduction, scripts, hashes and exit codes
 
-## Deliverable checklist
+The verdict is **ALL_PASS** only if all six gates have evidence-backed PASS. Otherwise report NOT_ALL_PASS and exact gate failures. A successful outer transaction or expected revert is not proof of a recovery; RPC errors are not evidence that assets do not exist. A read-only call does not change mainnet state.
 
-- Summary and result with exact commit SHA
-- `manifest.json` (chain, pinned block/hash, historical code, environment, elapsed time)
-- `results.json` (six evidence-backed statuses; `all_pass` boolean)
-- `calls.jsonl` with error/result separation, redacted
+### Required artifacts
+
+- `manifest.json`: chain IDs, pinned block number/hash, selected case, versions, real UTC timestamps
+- `results.json`: six gate statuses (PASS, FAIL, BLOCKED, NOT_RUN) with evidence paths, explicit `all_pass`
+- `calls.jsonl`: sanitized raw RPC requests/responses/errors
 - `provenance.md`, `hypotheses.md`, `report.md`
-- Executable replay scripts/tests and output logs
-- `SHA256SUMS.txt` computed from actual files
+- runnable local fork tests with recorded stdout/stderr and process exit codes
+- `SHA256SUMS.txt` computed from the actual final artifacts
 
-This repository is an evidence archive, **not** a claim that any team has already recovered an asset.
+The competition uses read-only calls and controlled simulation. No production broadcasts, unauthorized third-party fund movements, access-control bypasses, or fabricated experimental evidence. A submission directory is **not** an attestation that the participant has run anything.
