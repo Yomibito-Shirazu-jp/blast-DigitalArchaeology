@@ -1,0 +1,77 @@
+{
+  "challenge_version": "0.1",
+  "participant": "devin",
+  "agent": "Devin (Cognition) — SWE-2 High, CLI agent inside Devin Desktop",
+  "run": {
+    "start_utc": "2026-11-05T05:52:00Z (approximate, first unlogged RPC probe; first artifact mtime 06:04:28Z)",
+    "first_logged_call_utc": "2026-11-05T06:14:25.265848Z",
+    "last_logged_call_utc": "2026-11-05T06:16:36.699952Z",
+    "end_utc": "2026-11-05T06:55:00Z (approximate, submission assembly)",
+    "duration_minutes": "~63 including submission packaging"
+  },
+  "chain": {
+    "name": "Blast",
+    "chain_id": 81457,
+    "chain_id_hex": "0x13e31",
+    "pinned_block": 42502847,
+    "pinned_block_hex": "0x2888abf",
+    "pinned_block_hash": "0x9fa65187eb7dd1f902ba4a3cf3ec682d293a6c948d9bfc564134297614fc62c9",
+    "pinned_block_timestamp": 1793815509,
+    "head_at_capture": "0x2888bb5"
+  },
+  "rpc": {
+    "primary": "https://rpc.blast.io (public, full archive confirmed via state queries at block 500000 and 42502847)",
+    "secondary": "alchemy blast-mainnet (API key redacted; used for debug_traceCall prestateTracer diff)"
+  },
+  "case": {
+    "name": "munchables-lockmanager-sunken-blast",
+    "contract": {
+      "address": "0xEA091311Fc07139d753A6BBfcA27aB0224854Bae",
+      "name": "Munchables LockManager (post-exploit redeploy)",
+      "proxy": false,
+      "deploy_tx": "0xa73c806a5f2d808c6ea2d5a2e871b7b825af93c814b2c4c571100a08dfca9b6d",
+      "deploy_block": 4233706,
+      "bytecode_keccak256": "0x0b9373f057fba4b91d63403abcf250babfc3835aa62e567837d7f2a3914bccfd",
+      "bytecode_bytes": 17703,
+      "compiler": "v0.8.25+commit.b61c2a91",
+      "optimization": "enabled, 200 runs",
+      "evm_version": "paris",
+      "verified_source": "evidence/source.json (routescan etherscan-compatible API, no key required)"
+    },
+    "asset": {
+      "address": "0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad",
+      "symbol": "BLAST",
+      "decimals": 18
+    },
+    "claimant": {
+      "address": "0x3a57e71046a29dcc47db9e0fc11a893631413d5a",
+      "type": "EOA (eth_getCode = 0x at pinned block)",
+      "locked_quantity_wei": "100000000000000000000000",
+      "unlock_time": 1734916739,
+      "deposit_tx": "0xdfc9fc3a9d8c226e2b5c2ef45414398eaaed79b402a5bf4b969c8f1eb8896fea",
+      "deposit_block": 11757462
+    }
+  },
+  "tooling": {
+    "os": "Windows (git-bash)",
+    "cast": "1.8.3 (cae51ad458f6abb64852b7709eb784352429825d)",
+    "anvil": "1.8.3",
+    "forge": "1.8.3",
+    "python": "3.12.10",
+    "node": "v26.6.0"
+  },
+  "fork": {
+    "engine": "anvil 1.8.3",
+    "command": "anvil --fork-url https://rpc.blast.io --fork-block-number 42502847 --chain-id 81457",
+    "fork_tx_hash": "0xa2f4e81263e007b70e31157e4ff50823bfb607de7ba9db4d0a691e5b8c416c52",
+    "gas_used": 352043
+  },
+  "integrity": {
+    "no_mainnet_broadcast": true,
+    "no_private_keys": true,
+    "no_rpc_tokens_committed": true,
+    "synthetic_techniques_disclosed": [
+      "anvil_impersonateAccount and anvil_setBalance were used ONLY inside fork/ as a clearly-marked synthetic-actor diagnostic to produce a real tx receipt/event logs; primary EFFECT evidence is the read-only debug_traceCall prestateTracer diff evaluated under the depositor's own on-chain authorization."
+    ]
+  }
+}

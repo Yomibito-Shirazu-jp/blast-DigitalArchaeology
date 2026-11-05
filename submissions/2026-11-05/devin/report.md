@@ -1,0 +1,34 @@
+# Report — Blast eth_call Excavation: Munchables sunken BLAST
+
+**Verdict: ALL_PASS** (all six gates, evidence-backed — simulated recovery only; no mainnet transfer performed or claimed)
+
+## Selected case
+Munchables `LockManager` `0xEA091311Fc07139d753A6BBfcA27aB0224854Bae` on Blast (chain 81457), pinned block **42502847** (`0x9fa65187…fc62c9`, ts 1793815509). The project suffered a $62.5M insider exploit (Mar 2024, legacy contract `0x29958e8e…`), redeployed this contract (Jun 2024), then shut down entirely — official gitbook directs users to self-rescue via `unlock`. Stranded: **122,315.1853 BLAST** + 90 USDB + 0.5634 ETH. A true wreck: assets intact, crew gone, recovery hatch still functional.
+
+## Verified observations (each linked to logs/hashes)
+- Depositor EOA `0x3a57e71046a29dcc47db9e0fc11a893631413d5a` holds `lockedTokens.quantity = 1e23` (100,000 BLAST), `unlockTime` 1734916739 expired 2024-12-23 (`calls.jsonl#lockedTokens-player-blast-FIXED`, deposit tx `0xdfc9fc3a…`).
+- `eth_call unlock(BLAST, 1e23)` from depositor @PIN → `0x` success (`calls.jsonl#G4-unlock-eth_call-full`).
+- `prestateTracer` diff at PIN — upstream Alchemy archive and local anvil both show BLAST `balanceOf[player]→1e23`, `balanceOf[LockManager]→22,315.1853e18` (`fork/*_tracecall*.json`). Non-impersonated, read-only evaluation under the depositor's own authorization.
+- Synthetic-actor fork diagnostic (disclosed): tx `0xa2f4e8…` status 1, gas 352,043, `Transfer`/`Unlocked` events for 1e23; post state matches trace diff exactly (`fork/unlock_tx.json`, `fork/run_log.txt`).
+- Enforcement: non-depositor reverts `InsufficientLockAmountError`; post-claim double-unlock reverts — the authorization model held in every probe.
+
+## Failed hypotheses
+`getLogs` range limit (10k blocks) on the public RPC (HTTP 413) — worked around via explorer txlist; three wrong-selector eth_calls reverted and were re-run corrected (retained in calls.jsonl as honest error trail). See `hypotheses.md` H5.
+
+## Remaining candidate paths (untested, explicitly NOT_RUN)
+- 17 further BLAST lockers (~13,198 BLAST) + ETH/USDB dust — same `unlock` path presumed live.
+- Owner `claimERC20Yield` / `migrationManager` paths — not needed, unexplored.
+
+## Recovery claim
+Simulated only. Claimant authority: the depositor EOA itself — the calldata demonstrated is broadcastable solely by that wallet (msg.sender-keyed ledger; no relayer/operator path exists in code). Nothing was or could be moved by this run; upstream state verified unchanged.
+
+## Replay
+Prereqs: foundry 1.8.3 (`cast`, `anvil`), outbound HTTPS to `https://rpc.blast.io` (public archive). 
+```
+cd submissions/2026-11-05/devin/fork
+bash reproduce.sh        # exit 0 expected; ~90 s incl. fork boot
+```
+Recorded reference run: `fork/run_log.txt` (REPRODUCE_EXIT_CODE=0). Artifact integrity: `SHA256SUMS.txt`.
+
+## Time
+Preflight ≈05:52Z → submission ≈06:55Z (≈63 min inside a 3 h window). Formal call log spans 06:14:25–06:16:36Z; every logged call carries a UTC timestamp.
