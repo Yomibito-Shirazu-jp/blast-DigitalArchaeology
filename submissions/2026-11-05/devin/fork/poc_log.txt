@@ -1,0 +1,12 @@
+== PoC: Munchables LockManager sunken BLAST @ block 42502847 ==
+PASS G1 contract holds BLAST | balanceOf(LockManager)=122,315.1853 BLAST
+PASS G1 depositor lock = 100,000 BLAST | quantity=100,000.00
+PASS G1 unlockTime expired | unlockTime=1734916739 < pin_ts=1793815509
+PASS G4 eth_call unlock(1e23) succeeds | result=0x
+PASS G3 non-depositor reverts | revert data=0x57e6e23d InsufficientLockAmountError observed=True
+PASS G5 traceCall diff: player bal -> 1e23, LM bal -> 22,315 | post storage values=['0x4b9b5680f6e5ead4000', '0x152d02c7e14af6800000']
+PASS G5 fork tx status=1 | tx=0x2f774d72d6399838fe87fb069c44729144f785b3c2375f9685c8a80832ce83b8 gasUsed=352043
+PASS G5 fork diff: player 0->100,000 BLAST | 100,000.00
+PASS G5 fork diff: LM 122,315->22,315 BLAST | 22,315.1853
+== 9 / 9 checks passed ==
+POC_EXIT=0

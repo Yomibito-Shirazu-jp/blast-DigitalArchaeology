@@ -29,6 +29,6 @@
 - `calls.jsonl` — 34 sanitized verbatim JSON-RPC request/response pairs incl. retained errors and corrected re-runs
 - `provenance.md` / `hypotheses.md` / `report.md`
 - `evidence/` — verified source, full tx history, stranded-locker scan, bytecode
-- `fork/` — replay script, recorded run log, read-only trace diffs, synthetic-marked receipt
+- `fork/` — **`poc.py` (self-contained PoC: 9/9 checks PASS, exit 0 — see `poc_log.txt`)**, replay script, recorded run log, read-only trace diffs, synthetic-marked receipt
 
 No private keys, RPC tokens, or production transactions are included.
