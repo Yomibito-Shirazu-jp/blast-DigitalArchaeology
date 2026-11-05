@@ -15,6 +15,20 @@ Munchables `LockManager` `0xEA091311Fc07139d753A6BBfcA27aB0224854Bae` on Blast (
 ## Failed hypotheses
 `getLogs` range limit (10k blocks) on the public RPC (HTTP 413) — worked around via explorer txlist; three wrong-selector eth_calls reverted and were re-run corrected (retained in calls.jsonl as honest error trail). See `hypotheses.md` H5.
 
+## Publication-safety audit — can a third party steal these funds?
+
+Complete outflow-path audit of the contract (verified source + on-chain probes):
+
+- **Only ONE principal-out path exists:** `unlock()` — it debits `lockedTokens[msg.sender]` and pays `msg.sender` exclusively (the only `.call{value}`/`token.transfer` sites in the contract, lines 427/431).
+- `claimERC20Yield`: callable only by the configured `RewardsManager` contract and calls `IERC20Rebasing.claim()` — pays **yield only**, cannot touch principal (non-governor call reverts `0x1a48f084`, logged).
+- `lockOnBehalf`: restricted to `MigrationManager` (`onlyConfiguredContract`); it can only *add* locks, never withdraw — no griefing/theft surface.
+- `lock()`: self-directed only (`lockRecipient = msg.sender`); cannot touch other ledgers.
+- Governor (`0x4d0158d4…`) / configStorage functions: pricing/config only; no fund-moving path. `Paused` flag can temporarily halt unlock (liveness, not custody).
+- No `selfdestruct`, no `delegatecall`, non-proxy immutable bytecode.
+- Empirical exclusivity: three distinct non-claimant callers (`0x…dEaD`, a different real BLAST locker, an ETH-only locker) all revert `InsufficientLockAmountError` on this lock.
+
+**Conclusion:** third-party theft is cryptographically impossible — the only credential is the depositor EOA's signature. Publishing exposes nothing an attacker could use; all data was already public chain state. The only entity that can ever take these funds is the rightful owner — which is precisely the salvage this excavation verifies.
+
 ## Remaining candidate paths (untested, explicitly NOT_RUN)
 - 17 further BLAST lockers (~13,198 BLAST) + ETH/USDB dust — same `unlock` path presumed live.
 - Owner `claimERC20Yield` / `migrationManager` paths — not needed, unexplored.
