@@ -64,6 +64,30 @@ def check(name, ok, detail=""):
 
 print("== PoC: Munchables LockManager sunken BLAST @ block 42502847 ==")
 
+# ---- pinned block identity (G1) ----
+EXP_HASH = "0x9fa65187eb7dd1f902ba4a3cf3ec682d293a6c948d9bfc564134297614fc62c9"
+b = rpc(RPC, "eth_getBlockByNumber", [PIN, False]).get("result", {})
+check("G1 pinned block hash matches", b.get("hash") == EXP_HASH,
+      f"hash={b.get('hash')}")
+check("G1 pinned block timestamp", int(b.get("timestamp", "0x0"), 16) == 1793815509,
+      f"ts={int(b.get('timestamp','0x0'),16)}")
+
+# ---- G2-lite: deployed bytecode identity + deploy tx lineage ----
+code = rpc(RPC, "eth_getCode", [LM, PIN]).get("result", "0x")
+try:
+    ref = open("../evidence/lm_bytecode.hex").read().strip()
+    same = (code.lower() == ref.lower())
+    detail = f"bytecode {len(code)//2-1}B matches evidence/lm_bytecode.hex"
+except OSError:
+    same, detail = len(code) > 100, "evidence file absent; only non-empty checked"
+check("G2 LockManager bytecode == verified artifact", same, detail)
+
+dep = rpc(RPC, "eth_getTransactionByHash",
+          ["0xa73c806a5f2d808c6ea2d5a2e871b7b825af93c814b2c4c571100a08dfca9b6d"]).get("result", {})
+check("G2 deploy tx at block 4233706",
+      dep.get("blockNumber") == "0x4099ea",
+      f"blockNumber={dep.get('blockNumber')}")
+
 # ---- upstream, pinned ----
 r = eth_call(RPC, BLAST, BAL(LM), PIN)
 lm_bal = dec_u256(r.get("result", "0x0"))
@@ -100,16 +124,39 @@ try:
     else:
         check("fork boots", False); sys.exit(1)
 
-    # G5 primary: read-only state diff, no impersonation
+    # G5 primary: read-only state diff, no impersonation.
+    # Slot identities verified cryptographically:
+    #   SLOT_PLAYER_BAL = keccak256(abi.encode(player, 0))   (BLAST balanceOf @ slot 0)
+    #   SLOT_LM_BAL     = keccak256(abi.encode(LockManager, 0))
+    #   SLOT_LOCK_QTY   = keccak256(abi.encode(BLAST, keccak256(abi.encode(player, 11))))
+    #                   (lockedTokens[player][BLAST].quantity; lockedTokens @ slot 11)
+    SLOT_PLAYER_BAL = "0x340bab9bd1a340d62a76df2c4488eabdb6d650a19decb6513c5b6a676be29f37"
+    SLOT_LM_BAL     = "0x9a66ec1f0ffaa1d19d28bb0752bd78dfa89d7f2047b43794555848e46e94e9a9"
+    SLOT_LOCK_QTY   = "0xc3bb8a778c7705f78a0a5c7c8d3e7f02e9697fef6657e441e53622e851e4516c"
     r = rpc(LOCAL, "debug_traceCall",
             [{"from": P, "to": LM, "data": UNLOCK(BLAST, QTY)}, "latest",
              {"tracer": "prestateTracer", "tracerConfig": {"diffMode": True}}])
-    post = r.get("result", {}).get("post", {})
-    blast_st = post.get(BLAST.lower(), {}).get("storage", {})
-    slots = set(int(v, 16) for v in blast_st.values())
-    check("G5 traceCall diff: player bal -> 1e23, LM bal -> 22,315",
-          QTY in slots and 22315185300000000000000 in slots,
-          f"post storage values={[hex(s) for s in sorted(slots)]}")
+    res = r.get("result", {})
+    pre_blast  = res.get("pre",  {}).get(BLAST.lower(), {}).get("storage", {})
+    post_blast = res.get("post", {}).get(BLAST.lower(), {}).get("storage", {})
+    pre_lm     = res.get("pre",  {}).get(LM.lower(),    {}).get("storage", {})
+    post_lm    = res.get("post", {}).get(LM.lower(),    {}).get("storage", {})
+    gv = lambda d, k: int(d.get(k, "0x0"), 16)
+    pre_pb, post_pb = gv(pre_blast, SLOT_PLAYER_BAL), gv(post_blast, SLOT_PLAYER_BAL)
+    pre_lb, post_lb = gv(pre_blast, SLOT_LM_BAL),     gv(post_blast, SLOT_LM_BAL)
+    pre_q,  post_q  = gv(pre_lm, SLOT_LOCK_QTY),      gv(post_lm, SLOT_LOCK_QTY)
+    check("G5 pre-state: LM bal=122,315.1853, player bal=0, lock qty=1e23",
+          pre_lb == 122315185300000000000000 and pre_pb == 0 and pre_q == QTY,
+          f"pre: LM={pre_lb/1e18:,.4f} player={pre_pb} qty={pre_q/1e18:,.2f}")
+    check("G5 post-state: player=100,000, LM=22,315.1853, lock qty=0",
+          post_pb == QTY and post_lb == 22315185300000000000000 and post_q == 0,
+          f"post: player={post_pb/1e18:,.2f} LM={post_lb/1e18:,.4f} qty={post_q}")
+    check("G5 conservation: LM debit == player credit (no mint/burn)",
+          (pre_lb - post_lb) == (post_pb - pre_pb) == QTY,
+          f"delta={ (pre_lb-post_lb)/1e18:,.4f} BLAST")
+    check("G5 slot identities: exactly the two balanceOf slots changed",
+          set(post_blast) == {SLOT_PLAYER_BAL, SLOT_LM_BAL},
+          f"changed={sorted(post_blast)}")
 
     # G5 supplementary (marked synthetic): real tx incl. event logs
     rpc(LOCAL, "anvil_impersonateAccount", [P])

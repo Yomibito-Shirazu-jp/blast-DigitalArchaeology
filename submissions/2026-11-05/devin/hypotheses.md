@@ -13,7 +13,14 @@ Candidate selection: Blast ecosystem graveyards — Munchables (insider exploit 
 - `eth_call unlock(BLAST, 1e23)` from depositor @PIN → `0x` success (verbatim `calls.jsonl#G4-unlock-eth_call-full`).
 
 ## H3 — "Path is permissionless or exploitable by third party" → REJECTED (and required for legitimacy)
-Ledger keyed by `msg.sender`; `unlock` from `0x…dEaD` reverts `InsufficientLockAmountError (0x57e6e23d)` (`calls.jsonl#G3-negative-nonowner`). Only the depositor's wallet can produce the authorized call — the path is a legitimate self-claim, not a third-party transfer. This is the boundary between salvage verification and unauthorized movement; we verify the former only.
+Ledger keyed by `msg.sender`. Exclusivity matrix at PIN — all revert `InsufficientLockAmountError (0x57e6e23d)`:
+- `0x…dEaD` (no lock) — `calls.jsonl#G3-negative-nonowner`
+- `0x8f1dd997…6274` — a **different real BLAST locker** (2,500 BLAST) attempting the 1e23 lock — `calls.jsonl#G3-excl-realBLASTlocker-cant-claim`
+- `0xd3d4a8fe…9a48` — ETH-only locker attempting `unlock(BLAST,1)` — `calls.jsonl#G3-excl-ETHonly-locker`
+- post-claim second `unlock` — `calls.jsonl#G5-fork-double-unlock-revert`
+
+Only the depositor's wallet can produce the authorized call — a legitimate self-claim, not third-party transfer.
+**Governance surface:** source audit shows the only value-moving statements are unlock's sends to `msg.sender` (L427/L431). Governor `0x4d0158d4…7f26` / migrationManager `0x34270C64…8211` cannot route principal; `claimERC20Yield` reverts for non-governor (`0x1a48f084`) and concerns yield, not principal (`calls.jsonl#G3-claimERC20Yield-nonowner`, `migrationManager-FIXED`, `getConfiguredGovernor-FIXED`).
 
 ## H4 — "eth_call success is enough to claim EFFECT" → REJECTED by our own methodology
 eth_call proves non-reversion, not the asset diff. Effect was demonstrated two ways:
