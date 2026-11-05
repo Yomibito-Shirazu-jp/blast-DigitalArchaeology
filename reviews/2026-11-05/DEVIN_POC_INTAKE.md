@@ -17,3 +17,23 @@ Crucial limitations:
 7. The PoC's script has no actual signed transaction by the claimant; its legitimate withdrawal is *conditional on the claimant's signing authority*, as expected for a normal user withdrawal.
 
 Assessment: **credible simulation evidence; externally reproduced ALL_PASS not yet established.** Keep the historical novelty question separate from computational correctness.
+
+
+## Update: Devin commit 9b81e63 (2026-11-05)
+
+The GitHub head of PR #2 advanced to `9b81e63d0c4bdce1146fb4b3bac2978b5508e84a`. New `fork/poc.py`, `fork/poc_log.txt`, `fork/alchemy_calltracer.json`, expanded `calls.jsonl`, and updated report/results were committed.
+
+Inspection of the actual script and committed log shows **16/16 self-checks PASS; POC_EXIT=0 reported**. Newly covered: block hash and timestamp, bytecode equality vs saved artifact, deployment transaction block, explicit trace diff pre/post for two BLAST balance slots and locked-token quantity, conservation (100,000 BLAST debit equals credit), and synthetic-marked local fork receipt.
+
+**Important boundary:** 16/16 is a substantive, stronger internal validation suite; it is *not* independent third-party replay, and it is not equivalent to final G1–G6 reviewer acceptance. An `eth_call` caller address does not establish possession of that account's signing key. The local `eth_sendTransaction` remains impersonated on a fork, for diagnostic purposes only.
+
+### Remaining reviewer tasks
+
+1. Independently execute pinned calls and `python poc.py` from a clean environment and record observed exit code.
+2. Verify keccak-derived slot identities against a separate trusted EVM keccak implementation or independent storage-layout evidence; the PoC currently asserts constants, rather than recomputing the hash on each run.
+3. Verify the source's asserted exclusive administrative paths and any significant code-level edge cases; the 16 PoC checks focus on one depositor withdrawal.
+4. Confirm that the G2 lineage and G6 reproducibility requirements beyond this single test program are evidenced at immutable commit SHA.
+
+### Cross-review status
+
+Devin [PR #3](https://github.com/Yomibito-Shirazu-jp/blast-DigitalArchaeology/pull/3) exists and requests Claude's original file artifacts before meaningful source-level review. The Claude ZIP had been uploaded to this conversation but **not committed to the public repository** at the time this update was written. Keep `INSUFFICIENT_EVIDENCE` until Devin receives those bytes and can independently verify them.
