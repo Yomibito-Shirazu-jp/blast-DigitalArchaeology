@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "case_id": "EXAMPLE-REPLACE",
+  "report_utc": null,
+  "chain": {
+    "name": null,
+    "chain_id": null,
+    "snapshot_block": null,
+    "snapshot_block_hash": null,
+    "snapshot_utc": null
+  },
+  "site": {
+    "contract_address": null,
+    "source_commit_sha": null,
+    "code_hash": null,
+    "system_status": "UNKNOWN",
+    "provenance_evidence": []
+  },
+  "assets": [],
+  "totals": {
+    "estimated_usd": null,
+    "holding_address_count": null,
+    "token_contract_count": null,
+    "eligible_claimant_address_count": null,
+    "accounting_notes": null,
+    "pricing_timestamp_utc": null
+  },
+  "rights": {
+    "claimant_category": "UNKNOWN",
+    "evidence": [],
+    "authorization_type": "UNKNOWN",
+    "administrative_blockers": [],
+    "liabilities_status": "UNKNOWN"
+  },
+  "recovery": {
+    "salvage_class": "U",
+    "path_status": "UNPROVEN",
+    "read_only_call_status": "NOT_RUN",
+    "simulated_effect_status": "NOT_RUN",
+    "production_recovery_status": "NOT_PERFORMED",
+    "conditions": [],
+    "unverified_dependencies": []
+  },
+  "verification": {
+    "review_status": "NOT_REVIEWED",
+    "gates": {
+      "G1_TARGET": {
+        "status": "NOT_RUN",
+        "evidence": []
+      },
+      "G2_HISTORY": {
+        "status": "NOT_RUN",
+        "evidence": []
+      },
+      "G3_PATH": {
+        "status": "NOT_RUN",
+        "evidence": []
+      },
+      "G4_CALL": {
+        "status": "NOT_RUN",
+        "evidence": []
+      },
+      "G5_EFFECT": {
+        "status": "NOT_RUN",
+        "evidence": []
+      },
+      "G6_REPRO": {
+        "status": "NOT_RUN",
+        "evidence": []
+      }
+    },
+    "independent_replay": false
+  },
+  "publication": {
+    "safety_status": "PRIVATE_REVIEW",
+    "public_map_approved": false,
+    "restricted_artifacts": [],
+    "contact": "info@algorithm.dance"
+  }
+}
