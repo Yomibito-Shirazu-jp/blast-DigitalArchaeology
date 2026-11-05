@@ -16,7 +16,7 @@
         "calls.jsonl#lm-usdb-balance",
         "calls.jsonl#lm-weth-balance",
         "calls.jsonl#lm-native-eth",
-        "evidence/still_locked_all.json",
+        "evidence/still_locked_summary.json (per-depositor enumeration withdrawn)",
         "manifest.json"
       ]
     },
@@ -91,6 +91,6 @@
   "notes": [
     "PASS asserts evidence-backed verification at pinned state only; no mainnet recovery was performed or claimed.",
     "The depositor retains full legitimate claim rights: the same calldata broadcast from their wallet at any later block still works while lockedTokens.quantity > 0.",
-    "18 BLAST lockers (113,198 BLAST total) plus ETH/USDB dust remain — see evidence/still_locked_all.json."
+    "18 BLAST lockers (113,198 BLAST total) plus ETH/USDB dust remain — aggregates in evidence/still_locked_summary.json (enumeration withdrawn — responsible disclosure)."
   ]
 }

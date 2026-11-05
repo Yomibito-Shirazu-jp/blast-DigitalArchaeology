@@ -1,0 +1,10 @@
+{
+  "note": "Per-depositor enumeration withdrawn for responsible disclosure: the full address->claimable-amount mapping constituted a ready-made phishing target list. Aggregate statistics retained as evidence of inventory scale; individual entries remain publicly derivable from chain state but are not amplified here.",
+  "block": 42502847,
+  "aggregates": {
+    "BLAST": {"lockers": 18, "total_locked": "113198.0416 BLAST", "largest_single": "100000 BLAST (subject of this submission)"},
+    "ETH": {"lockers": 195, "total_locked": "0.0489 ETH"},
+    "USDB": {"lockers": 1, "total_locked": "10.0 USDB"}
+  },
+  "subject_depositor": "0x3a57e71046a29dcc47db9e0fc11a893631413d5a (retained: required for G1/G3/G4/G6 evidence chain)"
+}

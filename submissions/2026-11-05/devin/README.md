@@ -16,7 +16,7 @@
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 TARGET | PASS | `calls.jsonl` (chain-id, pinned-block, bytecode, balances), `evidence/still_locked_all.json` |
+| G1 TARGET | PASS | `calls.jsonl` (chain-id, pinned-block, bytecode, balances), `evidence/still_locked_summary.json` (enumeration withdrawn — responsible disclosure) |
 | G2 HISTORY | PASS | `evidence/source.json`, `evidence/src/`, `evidence/txlist_p1.json`, deploy/lock tx calls, `provenance.md` |
 | G3 PATH | PASS | `unlock` msg.sender-keyed; negative revert `0x57e6e23d` logged; `hypotheses.md` |
 | G4 CALL | PASS | verbatim `eth_call unlock(BLAST,1e23)` → `0x` at `0x2888abf` (`calls.jsonl#G4-*`) |

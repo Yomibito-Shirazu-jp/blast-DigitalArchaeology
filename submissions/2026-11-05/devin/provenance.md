@@ -28,4 +28,4 @@ Observed facts are marked **[ON-CHAIN]**; external-document claims are **[EXT]**
 - **[HYP]** The depositor extended their lock duration twice; unlockTime elapsed 2024-12-23 and the position was never reclaimed — consistent with an abandoned/dead-account scenario typical of a dead game.
 
 ## Stranded population
-- **[ON-CHAIN]** `getLocked` scan of all 1,658 lock/unlock participants @42502847: 18 players hold 113,198 BLAST total (top: this case 100,000; then 2,500 / 2,098 / 1,200 / ~500-class), 195 ETH-dust locks (~0.049 ETH), 1 USDB lock (10). See `evidence/still_locked_all.json`.
+- **[ON-CHAIN]** `getLocked` scan of all 1,658 lock/unlock participants @42502847: 18 players hold 113,198 BLAST total (top: this case 100,000; then 2,500 / 2,098 / 1,200 / ~500-class), 195 ETH-dust locks (~0.049 ETH), 1 USDB lock (10). Per-depositor enumeration withdrawn (responsible disclosure); aggregates in `evidence/still_locked_summary.json`.
