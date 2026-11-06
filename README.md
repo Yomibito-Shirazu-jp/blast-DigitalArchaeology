@@ -7,6 +7,7 @@
 | **[01 — Code](./01-digital-archaeology-code/)** | Source archives, research tools, reproducible experiments |
 | **[02 — Recovery Maps](./02-recovery-maps/)** | Asset locations, entitlement, recovery conditions, evidence and peer review |
 | **[03 — Summary](./03-summary/)** | Findings, project status and publication material |
+| **[04 — Blast Restoration](./04-blast-restoration/)** | Node deployment, historical chain state, isolated reproduction, validation and recovery reports |
 
 **Safety:** Public maps describe evidence and legitimate recovery conditions, not private keys or unsafe execution recipes. Original Blast source and submitted records remain preserved in their existing directories.
 
