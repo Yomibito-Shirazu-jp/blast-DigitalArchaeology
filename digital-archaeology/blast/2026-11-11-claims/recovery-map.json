@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "case_id": "BLAST-CLAIM-01",
+  "report_utc": null,
+  "chain": {
+    "name": "Ethereum",
+    "chain_id": 1,
+    "snapshot_block": null,
+    "snapshot_block_hash": null,
+    "snapshot_utc": null
+  },
+  "site": {
+    "contract_address": "0x9d31771458b421c7ea8a06cb8d12663e91617869",
+    "source_commit_sha": null,
+    "code_hash": null,
+    "system_status": "UNKNOWN",
+    "provenance_evidence": [
+      "README.md",
+      "yieldmanager-owner-observations.md"
+    ]
+  },
+  "assets": [
+    {
+      "chain_id": 1,
+      "token": "ETH",
+      "holding_address": "0x9d31771458b421c7ea8a06cb8d12663e91617869",
+      "raw_quantity": "8835161130613508156181",
+      "decimals": 18,
+      "display_quantity": "8835.161130613508156181",
+      "evidence": "dead-balance-and-gas.md"
+    },
+    {
+      "chain_id": 1,
+      "token": "ETH",
+      "holding_address": "0x23ea8c6aceb5673bbd712137ce2aa33db36cb513",
+      "raw_quantity": "802847250327264292274",
+      "decimals": 18,
+      "display_quantity": "802.847250327264292274",
+      "evidence": "dead-balance-and-gas.md"
+    }
+  ],
+  "totals": {
+    "estimated_usd": null,
+    "holding_address_count": null,
+    "token_contract_count": null,
+    "eligible_claimant_address_count": null,
+    "accounting_notes": "Historical log observations are not a common-block snapshot; holdings are not claimant entitlements.",
+    "pricing_timestamp_utc": null
+  },
+  "rights": {
+    "claimant_category": "DEPOSITOR",
+    "claimant_address": "0xfd8db47e7371dc3751d8b84ebd040046d70df5d0",
+    "evidence": [
+      "README.md"
+    ],
+    "authorization_type": "UNKNOWN",
+    "administrative_blockers": [
+      "Official claimant allocation and authorized execution path unresolved"
+    ],
+    "liabilities_status": "UNKNOWN"
+  },
+  "recovery": {
+    "salvage_class": "U",
+    "path_status": "UNPROVEN",
+    "read_only_call_status": "PARTIAL",
+    "simulated_effect_status": "NOT_RUN",
+    "production_recovery_status": "NOT_PERFORMED",
+    "conditions": [
+      "Official claimant allocation and enabled root",
+      "Authorized caller and rightful recipient",
+      "Verified unreceived claim state",
+      "Simulated rightful recipient balance increase"
+    ],
+    "unverified_dependencies": [
+      "USD withdrawal requestId and status",
+      "Historical root-setting EOA transaction evidence",
+      "Common-block code hashes and state"
+    ]
+  },
+  "verification": {
+    "review_status": "NOT_REVIEWED",
+    "gates": {
+      "G1_TARGET": {
+        "status": "PARTIAL",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      },
+      "G2_HISTORY": {
+        "status": "PARTIAL",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      },
+      "G3_PATH": {
+        "status": "PARTIAL",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      },
+      "G4_CALL": {
+        "status": "PARTIAL",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      },
+      "G5_EFFECT": {
+        "status": "NOT_RUN",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      },
+      "G6_REPRO": {
+        "status": "PARTIAL",
+        "evidence": [
+          "recovery-map.md"
+        ]
+      }
+    },
+    "independent_replay": false
+  },
+  "publication": {
+    "safety_status": "PUBLIC_MAP",
+    "public_map_approved": true,
+    "approval_basis": "User explicitly instructed public repository publication; map contains asset locations and legitimate recovery conditions.",
+    "restricted_artifacts": [],
+    "contact": "info@algorithm.dance"
+  },
+  "report_date_jst": "2026-11-11",
+  "evidence_commit_sha": "354c31e5bd68dc05eb91ba603ba9091503728195",
+  "routes": [
+    {
+      "id": "official-exit",
+      "priority": 1,
+      "salvage_class": "U",
+      "missing": [
+        "Official rows for claimant in both Exit datasets",
+        "Enabled root, proof, claimed and redeemer checks at pinned block",
+        "Claim payout recipient and economic effect"
+      ]
+    },
+    {
+      "id": "original-usd-withdrawal",
+      "priority": 2,
+      "salvage_class": "U",
+      "missing": [
+        "Finalize receipt and requestId",
+        "Recipient and finalized/claimed queue state",
+        "Available legitimate claim path"
+      ]
+    },
+    {
+      "id": "root-administration",
+      "priority": 3,
+      "salvage_class": "C",
+      "candidate_eoa": "0x32BB93599Eb77eD5d3A357d3898fcF8200f5b2E9",
+      "candidate_status": "PRIOR_CONVERSATION_ONLY",
+      "missing": [
+        "Exact vault address",
+        "Successful root-setting transaction and internal caller",
+        "Authority transition block and current permission"
+      ]
+    }
+  ]
+}
