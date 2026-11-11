@@ -161,3 +161,7 @@ SIM 0x1111111111111111111111111111111111111111 OK
 - [verify_claim.py](verify_claim.py)：Python標準ライブラリだけを用いるオフライン検証。`python verify_claim.py`。
 - [offline-verification.json](offline-verification.json)：今回の検証結果。
 - [SHA256SUMS.txt](SHA256SUMS.txt)：保存ファイルのSHA-256。
+
+## selectorとleafForの追加照合
+
+[対応表と実行ログ](selector-and-leaffor-confirmation.md)：`e0bab4c4 = DAI()`。別アドレスの空redeemers入力では、オンチェーンleafFor・ローカル計算・chunk 51のleafが `0x465909272ffe136b754597907b333d42ba18dcd988a3bf6a00fb5c096882f897` で一致。Exit1のauthority()はdead、コードは0バイト。
