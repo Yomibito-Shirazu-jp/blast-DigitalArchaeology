@@ -1,0 +1,32 @@
+# dead.js：残高・nonce・setRootsガス見積
+
+記録日：2026-11-11（日本時間）。出典：ユーザー提供のPowerShell実行出力。
+
+| 項目 | 観測値 |
+|---|---|
+| dEaD balance | 12642.726922874546820476 ETH |
+| dEaD nonce | 0 |
+| gasPrice | 0.038094398 gwei |
+| Exit1：setRootsのガス見積 | 53026 |
+| Exit1：target balance | 8835.161130613508156181 ETH |
+| Exit2：setRootsのガス見積 | 53026 |
+| Exit2：target balance | 802.847250327264292274 ETH |
+
+前回who3.jsのdead指定見積0xcf22と、今回の53026は同じ数値。観測種別は残高・nonce取得およびガス見積。
+
+## 実行出力
+
+```text
+PS C:\Users\ishij> node dead.js
+dEaD balance 12642.726922874546820476
+dEaD nonce 0
+gasPrice 0.038094398 gwei
+calldata 0xa4f041580000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111111111111111111
+0x9d31771458b421c7ea8a06cb8d12663e91617869 gas 53026
+  target balance 8835.161130613508156181
+0x23ea8c6aceb5673bbd712137ce2aa33db36cb513 gas 53026
+  target balance 802.847250327264292274
+PS C:\Users\ishij>
+```
+
+[両Exitのfrom比較](who3-both-exits.md) · [全体記録](README.md)
