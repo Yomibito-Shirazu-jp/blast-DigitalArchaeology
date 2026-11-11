@@ -1,0 +1,96 @@
+{
+  "challenge_version": "0.1",
+  "all_pass": true,
+  "gates": {
+    "G1_TARGET": {
+      "status": "PASS",
+      "summary": "LockManager 0xEA09…4Bae holds 122,315.1853 BLAST at pinned block 42502847; depositor 0x3a57e710…d5a holds lockedTokens.quantity = 1e23 (100,000 BLAST). Chain ID 81457, block hash and contract bytecode keccak recorded.",
+      "evidence": [
+        "calls.jsonl#chain-id",
+        "calls.jsonl#pinned-block",
+        "calls.jsonl#lockmanager-bytecode",
+        "calls.jsonl#depositor-eoa-check",
+        "calls.jsonl#lm-blast-balance",
+        "calls.jsonl#player-blast-balance",
+        "calls.jsonl#lockedTokens-player-blast-FIXED",
+        "calls.jsonl#lm-usdb-balance",
+        "calls.jsonl#lm-weth-balance",
+        "calls.jsonl#lm-native-eth",
+        "evidence/still_locked_summary.json (per-depositor enumeration withdrawn)",
+        "manifest.json"
+      ]
+    },
+    "G2_HISTORY": {
+      "status": "PASS",
+      "summary": "Contract lineage reconstructed: post-exploit LockManager redeployed at block 4233706 (deploy tx in evidence); verified Solidity 0.8.25 source retrieved and compiled layout matches on-chain selectors; depositor lock/unlock/lock lifecycle traced through 5,270-tx history; March 2024 insider exploit on legacy contract 0x29958e8e… documented (now fully drained); Code4rena 2024-07-munchables audit references this live contract.",
+      "evidence": [
+        "evidence/source.json",
+        "evidence/src/LockManager.sol",
+        "evidence/src/ILockManager.sol",
+        "evidence/txlist_p1.json",
+        "calls.jsonl#deploy-tx",
+        "calls.jsonl#lock-tx-11757462",
+        "calls.jsonl#prior-unlock-tx",
+        "provenance.md"
+      ]
+    },
+    "G3_PATH": {
+      "status": "PASS",
+      "summary": "unlock(token, qty) keys the lock ledger by msg.sender — only the depositor wallet can claim; unlockTime 1734916739 < pinned timestamp 1793815509; notPaused/nonReentrant pass at PIN; internal call accountManager.forceHarvest succeeds (proxy 0xfB5cd7… live). Exclusivity matrix @PIN, all revert InsufficientLockAmountError(0x57e6e23d): (a) 0x…dEaD, (b) a DIFFERENT real BLAST locker 0x8f1dd997 (2,500 BLAST) attempting this 1e23 lock, (c) an ETH-only locker 0xd3d4a8fe attempting unlock(BLAST,1). Post-claim double-unlock also reverts. Source audit: the ONLY value-moving statements in LockManager are unlock's two sends to msg.sender (L427 ETH, L431 ERC20); governor 0x4d0158d4… and migrationManager 0x34270C64… cannot route principal — claimERC20Yield by non-governor reverts 0x1a48f084 (yield != principal anyway).",
+      "evidence": [
+        "evidence/src/LockManager.sol (unlock, lines 407-435; only .call{value}/.transfer sites)",
+        "calls.jsonl#G3-negative-nonowner",
+        "calls.jsonl#G3-excl-realBLASTlocker-cant-claim",
+        "calls.jsonl#G3-excl-ETHonly-locker",
+        "calls.jsonl#G3-claimERC20Yield-nonowner",
+        "calls.jsonl#G5-fork-double-unlock-revert",
+        "calls.jsonl#migrationManager-FIXED",
+        "calls.jsonl#getConfiguredGovernor-FIXED",
+        "calls.jsonl#accountManager-FIXED",
+        "calls.jsonl#lockdrop-FIXED",
+        "hypotheses.md"
+      ]
+    },
+    "G4_CALL": {
+      "status": "PASS",
+      "summary": "Verbatim eth_call of unlock(BLAST, 1e23) with from=depositor at block 0x2888abf returns 0x (success, no revert) on the real archive RPC; same for 1e18 quantity. Requests/responses logged verbatim in calls.jsonl.",
+      "evidence": [
+        "calls.jsonl#G4-unlock-eth_call-full",
+        "calls.jsonl#G4-unlock-eth_call-1blast"
+      ]
+    },
+    "G5_EFFECT": {
+      "status": "PASS",
+      "summary": "Read-only debug_traceCall at pinned block, identical pre->post transition on upstream Alchemy archive AND local anvil: pre{balanceOf[LM]=122,315.1853e18 @slot0x9a66ec…, balanceOf[player]=0, lockedTokens qty=1e23 @slot0xc3bb8a…} -> post{balanceOf[player]=1e23 @slot0x340bab…, balanceOf[LM]=22,315.1853e18, lock qty=0(slot deleted)}. Conservation holds: LM debit == player credit == 1e23; exactly the two cryptographically-verified balanceOf slots (keccak(addr‖0)) changed — no mint/burn. callTracer trace shows full call graph + emitted Unlocked and ERC20 Transfer events (also non-impersonated). Supplementary marked-synthetic impersonated fork tx confirms same diff + receipt. Upstream player balance remains 0 — no real transfer performed.",
+      "evidence": [
+        "fork/alchemy_tracecall_diff.json",
+        "fork/tracecall_diff_local.json",
+        "fork/alchemy_calltracer.json",
+        "calls.jsonl#G5-upstream-callTracer-events",
+        "fork/poc.py (checks: pre-state, post-state, conservation, slot identity)",
+        "fork/poc_log.txt (16/16 PASS)",
+        "fork/unlock_tx.json (SYNTHETIC-actor diagnostic, disclosed)",
+        "calls.jsonl#G5-fork-player-bal-before",
+        "calls.jsonl#G5-fork-player-bal-after",
+        "calls.jsonl#G5-fork-lm-bal-before",
+        "calls.jsonl#G5-fork-lm-bal-after",
+        "calls.jsonl#G5-fork-lockedTokens-after"
+      ]
+    },
+    "G6_REPRO": {
+      "status": "PASS",
+      "summary": "Two independent replay paths: (1) fork/poc.py — stdlib-Python self-contained verifier, 16/16 checks PASS incl. block-hash pin, bytecode identity, deploy-tx lineage, exclusivity reverts, pre/post traceCall diff + conservation; recorded run POC_EXIT=0 (fork/poc_log.txt). (2) fork/reproduce.sh — cast/anvil end-to-end, REPRODUCE_EXIT_CODE=0 (fork/run_log.txt). All artifact hashes in SHA256SUMS.txt.",
+      "evidence": [
+        "fork/reproduce.sh",
+        "fork/run_log.txt",
+        "SHA256SUMS.txt",
+        "manifest.json"
+      ]
+    }
+  },
+  "notes": [
+    "PASS asserts evidence-backed verification at pinned state only; no mainnet recovery was performed or claimed.",
+    "The depositor retains full legitimate claim rights: the same calldata broadcast from their wallet at any later block still works while lockedTokens.quantity > 0.",
+    "18 BLAST lockers (113,198 BLAST total) plus ETH/USDB dust remain — aggregates in evidence/still_locked_summary.json (enumeration withdrawn — responsible disclosure)."
+  ]
+}
