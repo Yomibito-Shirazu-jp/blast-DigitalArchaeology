@@ -1,0 +1,15 @@
+{
+  "keccak_vectors_pass": true,
+  "abi_leaf": "0x455bbf72cec644479140c4b960c3179951ef2943c17021468fcdd8eb756826c3",
+  "stored_leaf_matches_abi": false,
+  "proof_steps": [
+    "0xd493129acf7346232ac0d7ea708db01304d7af7a5ea454f58968dd60c89a15f6",
+    "0x294af4d0cfa761b354a1e1db2f088f14046e2f52f8e71a371b95dd2648babf32",
+    "0x57b4e3e9e333363684be5869866cf26fff8ed9bdbdd16839719bccc79a521cab",
+    "0xcfc12eab4937f6f3d3ceb501304adf8d9169a3bf79dc543a856fdc54889f9ba3"
+  ],
+  "proof_root_matches": true,
+  "selector": "0x06301e28",
+  "calldata_bytes": 420,
+  "calldata_matches_saved": true
+}
