@@ -11,7 +11,7 @@
 | e0bab4c4(zero) | PASS gas=0x6a22（27170） | PASS gas=0x6a22（27170） |
 | upgradeToAndCall(other,0x) | ng 0x91a7df1a | ng 0x91a7df1a |
 
-e0bab4c4の関数名・引数型はこの出力では未特定。PASSはガス見積の結果として記録する。
+後続sig.jsによりe0bab4c4は `DAI()` と対応した。PASSはDAI getterのガス見積結果。[selector対応とleafFor照合](selector-and-leaffor-confirmation.md)。
 
 ## 実行出力
 
